@@ -13,11 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('password_resets', function (Blueprint $table) {
+        Schema::create('files', function (Blueprint $table) {
             $table->engine = 'InnoDB'; // Supports transactions, row-level locking, foreign keys and encryption for tables
-            $table->string('email')->index();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
+            $table->increments('id');
+            $table->uuid('uuid');
+            $table->string('name');
+            $table->string('path');
+            $table->string('size');
+            $table->string('type');
+            $table->timestamps();
         });
     }
 
@@ -28,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('password_resets');
+        Schema::dropIfExists('files');
     }
 };

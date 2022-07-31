@@ -13,15 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('personal_access_tokens', function (Blueprint $table) {
+        Schema::create('jwt_tokens', function (Blueprint $table) {
             $table->engine = 'InnoDB'; // Supports transactions, row-level locking, foreign keys and encryption for tables
             $table->id();
-            $table->morphs('tokenable');
-            $table->string('name');
-            $table->string('token', 64)->unique();
-            $table->text('abilities')->nullable();
-            $table->timestamp('last_used_at')->nullable();
+            $table->text('unique_id');
+            $table->foreignUuid('user_id')->references('uuid')->on('users')->cascadeOnDelete();
+            $table->string('token_title');
+            $table->json('restrictions')->nullable();
+            $table->json('permissions')->nullable();
             $table->timestamps();
+            $table->timestamp('expires_at')->nullable();
+            $table->timestamp('last_used_at')->nullable();
+            $table->timestamp('refreshed_at')->nullable();
         });
     }
 
@@ -32,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('personal_access_tokens');
+        Schema::dropIfExists('jwt_tokens');
     }
 };

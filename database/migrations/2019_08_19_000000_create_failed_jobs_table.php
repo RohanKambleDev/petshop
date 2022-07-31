@@ -14,6 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('failed_jobs', function (Blueprint $table) {
+            $table->engine = 'InnoDB'; // Supports transactions, row-level locking, foreign keys and encryption for tables
             $table->id();
             $table->string('uuid')->unique();
             $table->text('connection');

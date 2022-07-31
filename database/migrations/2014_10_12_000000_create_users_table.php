@@ -14,13 +14,21 @@ return new class extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
+            $table->engine = 'InnoDB'; // Supports transactions, row-level locking, foreign keys and encryption for tables
             $table->id();
-            $table->string('name');
+            $table->uuid('uuid')->index();
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->boolean('is_admin', 1)->default(0);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->rememberToken();
+            $table->string('avatar')->nullable();
+            $table->string('address');
+            $table->string('phone_number');
+            $table->boolean('is_marketing', 1)->default(0);
             $table->timestamps();
+            $table->timestamp('last_login_at')->nullable();
         });
     }
 
