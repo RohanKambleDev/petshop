@@ -5,11 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Models\User;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\API\Auth\LoginRequest;
 use App\Http\Requests\API\Auth\RegisterRequest;
-use Exception;
-
-use function PHPUnit\Framework\throwException;
 
 class AuthController extends Controller
 {
@@ -31,7 +29,7 @@ class AuthController extends Controller
         $newUserResponse['token'] = $token;
         $newUserResponse['uuid']  = $newUser->pluck('uuid')->first();
 
-        // in the response send back user uuid and token
+        // in the response send back user data and token
         $response = [
             'success' => 1,
             'data'    => $newUserResponse,
@@ -43,9 +41,30 @@ class AuthController extends Controller
         return response()->json($response, Response::HTTP_OK);
     }
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request, User $user)
     {
-        $response = $request->all();
-        return response()->json($response, 200);
+        // get validated request data
+        $credentials = $request->validated();
+
+        if (Auth::attempt($credentials)) {
+            // in the response send back user token
+            $response = [
+                'success' => 1,
+                'data'    => ['token' => $user->getToken()],
+                'error'   => null,
+                'errors'  => [],
+                'extra'   => []
+            ];
+        } else {
+            $response = [
+                'success' => 0,
+                'data'    => [],
+                'error'   => "Failed to authenticate user",
+                'errors'  => [],
+                'extra'   => []
+            ];
+        }
+
+        return response()->json($response, Response::HTTP_OK);
     }
 }
