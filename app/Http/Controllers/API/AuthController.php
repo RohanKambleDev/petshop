@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers\API;
 
+use DateTime;
 use App\Models\User;
 use Illuminate\Http\Response;
+use App\Services\Auth\LcobucciJWT;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\API\Auth\LoginRequest;
 use App\Http\Requests\API\Auth\RegisterRequest;
 
 class AuthController extends Controller
 {
+    protected $lcobucciJwt;
     public function __construct()
     {
+        $this->lcobucciJwt = new LcobucciJWT;
     }
 
     public function register(RegisterRequest $request, User $user)
@@ -45,12 +50,18 @@ class AuthController extends Controller
     {
         // get validated request data
         $credentials = $request->validated();
+        $apiToken    = $request->bearerToken();
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials) && $this->lcobucciJwt->validateApiToken($apiToken)) {
+            // if (Auth::attempt($credentials)) {
+
+            // generate new token
+            $token = $this->lcobucciJwt->getApiToken(Auth::user()->uuid);
+
             // in the response send back user token
             $response = [
                 'success' => 1,
-                'data'    => ['token' => $user->getToken()],
+                'data'    => ['token' => $token],
                 'error'   => null,
                 'errors'  => [],
                 'extra'   => []
