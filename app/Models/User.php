@@ -56,6 +56,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * crete a user
+     *
+     * @param  mixed $data
+     * @return user obj
+     */
     public function add($data)
     {
         $data['uuid'] = Str::orderedUuid(); // create UUID
@@ -63,11 +69,12 @@ class User extends Authenticatable
         return self::create($data);
     }
 
-    public function getToken()
-    {
-        return Str::orderedUuid(); // temp token
-    }
-
+    /**
+     * resetPassword
+     *
+     * @param  array $data having email & password
+     * @return boolean
+     */
     public function resetPassword($data)
     {
         $user = self::where('email', $data['email'])->first();
@@ -76,5 +83,19 @@ class User extends Authenticatable
         }
         $user->password = bcrypt($data['password']); // hash the password
         return $user->save();
+    }
+
+    /**
+     * getUserByEmail
+     *
+     * @param  string $email
+     * @return user obj
+     */
+    public function getUserByEmail($email)
+    {
+        if (empty($email)) {
+            return null;
+        }
+        return self::where('email', '=', $email)->first();
     }
 }

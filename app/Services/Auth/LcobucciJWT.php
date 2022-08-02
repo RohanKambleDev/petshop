@@ -17,6 +17,7 @@
 
 namespace App\Services\Auth;
 
+use Exception;
 use DateTimeZone;
 use DateTimeImmutable;
 use Lcobucci\JWT\Token;
@@ -47,7 +48,6 @@ class LcobucciJWT
     {
         $this->config = $this->setConfiguration();
     }
-
     private function getPrivateKeyPath()
     {
         return storage_path(self::KEY_FOLDER_NAME . '/' . self::KEY_PATH . '/' . self::PRIVATE_KEY_FILE_NAME);
@@ -80,7 +80,6 @@ class LcobucciJWT
             // You may also override the JOSE encoder/decoder if needed by providing extra arguments here
         );
     }
-
     private function issueToken()
     {
         assert($this->config instanceof Configuration);
@@ -92,45 +91,15 @@ class LcobucciJWT
             // Configures the issuer (iss claim)
             ->issuedBy('https://rohutech.com')
             // Configures the audience (aud claim)
-            ->permittedFor('https://rohankamble.com')
+            // ->permittedFor('https://rohankamble.com')
             // Configures the id (jti claim)
-            ->identifiedBy('4f1g23a12aa')
+            ->identifiedBy($this->uuid)
             // Configures the time that the token was issue (iat claim)
             ->issuedAt($now)
             // Configures the time that the token can be used (nbf claim)
             ->canOnlyBeUsedAfter($now->modify('+1 minute'))
             // Configures the expiration time of the token (exp claim)
-            ->expiresAt($now->modify('+2 minute'))
-            // Configures a new claim, called "uid"
-            ->withClaim('uid', $this->uuid)
-            // Configures a new header, called "foo"
-            // ->withHeader('foo', 'bar')
-            // Builds a new token
-            ->getToken($this->config->signer(), $this->config->signingKey());
-
-        return $token->toString();
-    }
-
-    private function issuePasswordResetToken()
-    {
-        assert($this->config instanceof Configuration);
-
-        $now   = new DateTimeImmutable();
-        // $clock = SystemClock::fromUTC(); // use the clock for issuing and validation
-        // $now = $clock->now();
-        $token = $this->config->builder()
-            // Configures the issuer (iss claim)
-            ->issuedBy('https://rohutech.com')
-            // Configures the audience (aud claim)
-            ->permittedFor('https://rohankamble.com')
-            // Configures the id (jti claim)
-            ->identifiedBy('4f1g23a12aa')
-            // Configures the time that the token was issue (iat claim)
-            ->issuedAt($now)
-            // Configures the time that the token can be used (nbf claim)
-            ->canOnlyBeUsedAfter($now->modify('+1 minute'))
-            // Configures the expiration time of the token (exp claim)
-            ->expiresAt($now->modify('+2 minute'))
+            ->expiresAt($now->modify('+10 minute'))
             // Configures a new claim, called "uid"
             // ->withClaim('uid', $this->uuid)
             // Configures a new header, called "foo"
@@ -156,11 +125,11 @@ class LcobucciJWT
     {
         $clock = SystemClock::fromUTC(); // use the clock for issuing and validation
         $this->config->setValidationConstraints(
-            new IdentifiedBy('4f1g23a12aa'),
+            new IdentifiedBy($this->uuid),
             new IssuedBy('https://rohutech.com'),
-            new PermittedFor('https://rohankamble.com'),
+            // new PermittedFor('https://rohankamble.com'),
             new SignedWith($this->config->signer(), $this->config->verificationKey()),
-            // new StrictValidAt($clock)
+            new StrictValidAt($clock)
         );
 
         $constraints = $this->config->validationConstraints();
@@ -173,14 +142,18 @@ class LcobucciJWT
         return $this->issueToken();
     }
 
-    public function getPasswordResetApiToken()
+    public function validateApiToken($token, $uuid)
     {
-        return $this->issuePasswordResetToken();
-    }
-
-    public function validateApiToken($token)
-    {
+        if (empty($uuid)) {
+            throw new Exception('User not registered');
+        }
+        $this->uuid = $uuid;
         $parsedToken = $this->parseToken($token);
         return $this->validateToken($parsedToken);
+    }
+
+    public function getParsedToken($token)
+    {
+        return $this->parseToken($token);
     }
 }
