@@ -18,8 +18,17 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-
 Route::controller(AuthController::class)->group(function () {
-    Route::post('v1/user/register', 'register')->name('register');
+    Route::post('v1/user/create', 'register')->name('register');
     Route::post('v1/user/login', 'login')->name('login');
+    Route::get('v1/user/logout', 'logout')->name('logout');
+    Route::post('v1/user/forgot-password', 'forgotPassword')->name('forgot-password');
+    Route::post('v1/user/reset-password-token', 'resetPasswordToken')->name('reset-password-token');
+});
+
+Route::controller(UserController::class)->group(function () {
+    Route::get('v1/user', 'view')->name('view-user-account');
+    Route::delete('v1/user', 'delete')->name('delete-user-account');
+    Route::get('v1/user/orders', 'delete')->name('list-user-orders');
+    Route::put('v1/user/edit', 'delete')->name('update-user');
 });

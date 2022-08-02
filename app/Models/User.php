@@ -13,6 +13,20 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
+
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -34,6 +48,7 @@ class User extends Authenticatable
 
     /**
      * The attributes that should be cast.
+     * casting email_verified_at to datetime format
      *
      * @var array<string, string>
      */
@@ -45,11 +60,21 @@ class User extends Authenticatable
     {
         $data['uuid'] = Str::orderedUuid(); // create UUID
         $data['password'] = bcrypt($data['password']); // hash the password
-        return User::create($data);
+        return self::create($data);
     }
 
     public function getToken()
     {
         return Str::orderedUuid(); // temp token
+    }
+
+    public function resetPassword($data)
+    {
+        $user = self::where('email', $data['email'])->first();
+        if ($user === null) {
+            return false;
+        }
+        $user->password = bcrypt($data['password']); // hash the password
+        return $user->save();
     }
 }

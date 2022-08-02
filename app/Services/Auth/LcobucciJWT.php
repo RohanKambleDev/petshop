@@ -1,5 +1,20 @@
 <?php
 
+/**
+ * 
+ * The JWT specification defines seven reserved claims that are not required, 
+    but are recommended to allow interoperability with third-party applications. These are:
+    iss (issuer): Issuer of the JWT
+    sub (subject): Subject of the JWT (the user)
+    aud (audience): Recipient for which the JWT is intended
+    exp (expiration time): Time after which the JWT expires
+    nbf (not before time): Time before which the JWT must not be accepted for processing
+    iat (issued at time): Time at which the JWT was issued; can be used to determine age of the JWT
+    jti (JWT ID): Unique identifier; can be used to prevent the JWT from being replayed (allows a token to be used only once)
+ * 
+ * 
+ */
+
 namespace App\Services\Auth;
 
 use DateTimeZone;
@@ -77,7 +92,7 @@ class LcobucciJWT
             // Configures the issuer (iss claim)
             ->issuedBy('https://rohutech.com')
             // Configures the audience (aud claim)
-            ->permittedFor('http://rohankamble.com')
+            ->permittedFor('https://rohankamble.com')
             // Configures the id (jti claim)
             ->identifiedBy('4f1g23a12aa')
             // Configures the time that the token was issue (iat claim)
@@ -88,6 +103,36 @@ class LcobucciJWT
             ->expiresAt($now->modify('+2 minute'))
             // Configures a new claim, called "uid"
             ->withClaim('uid', $this->uuid)
+            // Configures a new header, called "foo"
+            // ->withHeader('foo', 'bar')
+            // Builds a new token
+            ->getToken($this->config->signer(), $this->config->signingKey());
+
+        return $token->toString();
+    }
+
+    private function issuePasswordResetToken()
+    {
+        assert($this->config instanceof Configuration);
+
+        $now   = new DateTimeImmutable();
+        // $clock = SystemClock::fromUTC(); // use the clock for issuing and validation
+        // $now = $clock->now();
+        $token = $this->config->builder()
+            // Configures the issuer (iss claim)
+            ->issuedBy('https://rohutech.com')
+            // Configures the audience (aud claim)
+            ->permittedFor('https://rohankamble.com')
+            // Configures the id (jti claim)
+            ->identifiedBy('4f1g23a12aa')
+            // Configures the time that the token was issue (iat claim)
+            ->issuedAt($now)
+            // Configures the time that the token can be used (nbf claim)
+            ->canOnlyBeUsedAfter($now->modify('+1 minute'))
+            // Configures the expiration time of the token (exp claim)
+            ->expiresAt($now->modify('+2 minute'))
+            // Configures a new claim, called "uid"
+            // ->withClaim('uid', $this->uuid)
             // Configures a new header, called "foo"
             // ->withHeader('foo', 'bar')
             // Builds a new token
@@ -113,19 +158,24 @@ class LcobucciJWT
         $this->config->setValidationConstraints(
             new IdentifiedBy('4f1g23a12aa'),
             new IssuedBy('https://rohutech.com'),
-            new PermittedFor('http://rohankamble.com'),
+            new PermittedFor('https://rohankamble.com'),
             new SignedWith($this->config->signer(), $this->config->verificationKey()),
-            new StrictValidAt($clock)
+            // new StrictValidAt($clock)
         );
 
         $constraints = $this->config->validationConstraints();
         return $this->config->validator()->validate($token, ...$constraints);
     }
 
-    public function getApiToken($uuid)
+    public function getUserApiToken($uuid)
     {
         $this->uuid = $uuid;
         return $this->issueToken();
+    }
+
+    public function getPasswordResetApiToken()
+    {
+        return $this->issuePasswordResetToken();
     }
 
     public function validateApiToken($token)
