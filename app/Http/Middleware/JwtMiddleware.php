@@ -7,7 +7,6 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Services\Auth\LcobucciJWT;
-use Illuminate\Support\Facades\Auth;
 
 class JwtMiddleware
 {
@@ -32,7 +31,8 @@ class JwtMiddleware
 
             $lcobucciJwt = new LcobucciJWT;
             $apiToken    = $request->bearerToken();
-            $uuid        = $request->validate(['user' => 'required']);
+            $parsedToken = $lcobucciJwt->getParsedToken($apiToken);
+            $uuid        = $parsedToken->claims()->get('jti');
 
             if (empty($uuid) || !$lcobucciJwt->validateApiToken($apiToken, $uuid)) {
                 return response()->json($response, Response::HTTP_INTERNAL_SERVER_ERROR);

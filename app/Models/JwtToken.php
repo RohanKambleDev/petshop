@@ -46,17 +46,14 @@ class JwtToken extends Model
      * @param  mixed $data
      * @return model obj
      */
-    public function add($token)
+    public function add($token, $user)
     {
-        if (!Auth::user()) {
-            throw new Exception('User not logged In');
-        }
         $lcobucciJwt = new LcobucciJWT;
         $parsedToken = $lcobucciJwt->getParsedToken($token);
 
         $data = [
-            'unique_id' => Str::orderedUuid(), // create UUID
-            'user_id'   => Auth::user()->uuid,
+            'unique_id'   => Str::orderedUuid(), // create UUID
+            'user_id'     => $user->uuid,
             'token_title' => $parsedToken->claims()->get('jti'),
             // 'restrictions' => ,
             // 'permissions' => ,
@@ -77,5 +74,13 @@ class JwtToken extends Model
             ->where('expires_at', '>', Carbon::now()->format('Y-m-d h:i:s'))
             ->get()
             ->last();
+    }
+
+    public function removeJwtToken($token)
+    {
+        $lcobucciJwt = new LcobucciJWT;
+        $parsedToken = $lcobucciJwt->getParsedToken($token);
+        $uuid = $parsedToken->claims()->get('jti');
+        return self::where('user_id', $uuid)->delete();
     }
 }

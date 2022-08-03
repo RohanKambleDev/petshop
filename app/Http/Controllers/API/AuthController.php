@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Exception;
 use App\Models\User;
 use App\Models\JwtToken;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Services\Auth\LcobucciJWT;
 use App\Http\Controllers\Controller;
@@ -52,7 +53,8 @@ class AuthController extends Controller
 
         // generate new token
         $token = $this->lcobucciJwt->getUserApiToken($this->data['uuid']);
-        $insertedToken = $jwtToken->add($token);
+        // insert jwt claims to db
+        $insertedToken = $jwtToken->add($token, $newUser->first());
         if (!$insertedToken->first() instanceof JwtToken) {
             throw new Exception('Token not generated');
         }
@@ -85,7 +87,8 @@ class AuthController extends Controller
 
             // generate new token
             $token = $this->lcobucciJwt->getUserApiToken(Auth::user()->uuid);
-            $insertedToken = $jwtToken->add($token);
+            // insert jwt claims to db
+            $insertedToken = $jwtToken->add($token, Auth::user());
             if (!$insertedToken->first() instanceof JwtToken) {
                 throw new Exception('Token not generated');
             }
@@ -101,16 +104,26 @@ class AuthController extends Controller
         return $this->buildResponse();
     }
 
+
     /**
      * logout
      *
-     * @return void
+     * @param  mixed $request
+     * @param  mixed $jwtToken
+     * @return array
      */
-    public function logout()
+    public function logout(Request $request, JwtToken $jwtToken)
     {
-        // prepare for response
-        $this->success = 1;
-        $this->statusCode = Response::HTTP_OK;
+        $token = $request->bearerToken();
+        // delete jwt token from db
+        if (!empty($token) && $jwtToken->removeJwtToken($token)) {
+            // prepare for response
+            $this->success = 1;
+            $this->statusCode = Response::HTTP_OK;
+        } else {
+            $this->error = "Failed to authenticate user";
+        }
+
         return $this->buildResponse();
     }
 

@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['api.format'])->prefix('v1/user/')->controller(AuthController::class)->group(function () {
     Route::post('create', 'register')->name('register');
     Route::post('login', 'login')->name('login');
-    Route::get('logout', 'logout')->name('logout');
+    Route::middleware(['jwt.verify'])->get('logout', 'logout')->name('logout');
     Route::post('forgot-password', 'forgotPassword')->name('forgot-password');
     Route::post('reset-password-token', 'resetPasswordToken')->name('reset-password-token');
 });
