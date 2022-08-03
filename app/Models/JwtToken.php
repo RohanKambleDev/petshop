@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Exception;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Services\Auth\LcobucciJWT;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class JwtToken extends Model
@@ -41,6 +41,54 @@ class JwtToken extends Model
     ];
 
     /**
+     * The attributes that should be cast.
+     * casting email_verified_at to datetime format
+     *
+     * @var array<string, string>
+     */
+    // protected $casts = [
+    //     'expires_at'   => 'datetime:Y-m-d h:i:s',
+    //     'last_used_at' => 'datetime:Y-m-d h:i:s',
+    //     'refreshed_at' => 'datetime:Y-m-d h:i:s',
+    // ];
+
+    /**
+     * Interact with the expires_at
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function expiresAt(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => Carbon::parse($value)->format('Y-m-d h:i:s')
+        );
+    }
+
+    /**
+     * Interact with the last_used_at
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function lastUsedAt(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => Carbon::parse($value)->format('Y-m-d h:i:s')
+        );
+    }
+
+    /**
+     * Interact with the refreshed_at
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function refreshedAt(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => Carbon::parse($value)->format('Y-m-d h:i:s')
+        );
+    }
+
+    /**
      * create new entry
      *
      * @param  mixed $data
@@ -57,9 +105,9 @@ class JwtToken extends Model
             'token_title' => $parsedToken->claims()->get('jti'),
             // 'restrictions' => ,
             // 'permissions' => ,
-            'expires_at' => $parsedToken->claims()->get('exp')->format('Y-m-d h:i:s'),
-            // 'last_used_at' => ,
-            // 'refreshed_at' => ,
+            'expires_at'   => $parsedToken->claims()->get('exp'),
+            'last_used_at' => Carbon::now(),
+            'refreshed_at' => Carbon::now(),
         ];
         return self::create($data);
     }
@@ -79,8 +127,7 @@ class JwtToken extends Model
     public function removeJwtToken($token)
     {
         $lcobucciJwt = new LcobucciJWT;
-        $parsedToken = $lcobucciJwt->getParsedToken($token);
-        $uuid = $parsedToken->claims()->get('jti');
+        $uuid = $lcobucciJwt->getUserUuid($token);
         return self::where('user_id', $uuid)->delete();
     }
 }

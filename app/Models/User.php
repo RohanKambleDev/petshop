@@ -3,8 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Carbon\Carbon;
+use Exception;
+use DateTimeInterface;
 use Illuminate\Support\Str;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -57,6 +62,18 @@ class User extends Authenticatable
     ];
 
     /**
+     * Interact with the last_login_at
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function lastLoginAt(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => Carbon::parse($value)->format('Y-m-d h:i:s')
+        );
+    }
+
+    /**
      * crete a user
      *
      * @param  mixed $data
@@ -97,5 +114,32 @@ class User extends Authenticatable
             return null;
         }
         return self::where('email', '=', $email)->first();
+    }
+
+    public function getUserByUuid($uuid)
+    {
+        $user = self::where('uuid', $uuid)->get();
+        if ($user->isNotEmpty()) {
+            return $user->first();
+        }
+        return collect();
+    }
+
+    public function updateField($uuid, $column, $value)
+    {
+        return self::where('uuid', $uuid)->update([$column => $value]);
+    }
+
+    public function updateFieldsInBulk($uuid, $data)
+    {
+        if (!empty($data['password'])) {
+            $data['password'] = bcrypt($data['password']); // hash the password
+        }
+        return self::where('uuid', $uuid)->update($data);
+    }
+
+    public function deleteRecord($uuid)
+    {
+        return self::where('uuid', $uuid)->delete();
     }
 }

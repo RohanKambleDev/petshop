@@ -66,8 +66,7 @@ class Kernel extends HttpKernel
 
         // API specific middlewares
         'api.request' => \App\Http\Middleware\ApiRequestFormatter::class,
-        'api.response' => \App\Http\Middleware\ApiResponseFormatter::class,
         'jwt.verify' => \App\Http\Middleware\JwtMiddleware::class,
-        'api.format' => \App\Http\Middleware\ApiResponseFormatter::class
+        'api.response' => \App\Http\Middleware\ApiResponseFormatter::class,
     ];
 }

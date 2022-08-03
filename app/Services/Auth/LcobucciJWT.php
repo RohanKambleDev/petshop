@@ -96,8 +96,8 @@ class LcobucciJWT
             ->identifiedBy($this->uuid)
             // Configures the time that the token was issue (iat claim)
             ->issuedAt($now)
-            // Configures the time that the token can be used (nbf claim)
-            ->canOnlyBeUsedAfter($now->modify('+1 minute'))
+            // Configures the time that the token can be used after (nbf claim)
+            ->canOnlyBeUsedAfter($now->modify('+1 sec'))
             // Configures the expiration time of the token (exp claim)
             ->expiresAt($now->modify('+10 minute'))
             // Configures a new claim, called "uid"
@@ -155,5 +155,11 @@ class LcobucciJWT
     public function getParsedToken($token)
     {
         return $this->parseToken($token);
+    }
+
+    public function getUserUuid($token)
+    {
+        $parsedToken = $this->getParsedToken($token);
+        return $parsedToken->claims()->get('jti');
     }
 }

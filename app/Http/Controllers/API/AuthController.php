@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\JwtToken;
 use Illuminate\Http\Request;
@@ -43,6 +44,7 @@ class AuthController extends Controller
     {
         // get validated request data
         $requestData = $request->validated();
+        unset($requestData['avatar']);
 
         // insert into user DB
         $newUser = $user->add($requestData);
@@ -81,6 +83,9 @@ class AuthController extends Controller
         $credentials = $request->validated();
 
         if (Auth::attempt($credentials)) {
+
+            // update last logged in at
+            $user->updateField(Auth::user()->uuid, 'last_login_at', Carbon::now());
 
             // if found try to use the same
             $existingJwt = $jwtToken->getRecordByUser(Auth::user()->uuid);

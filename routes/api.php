@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\API\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::middleware(['api.format'])->prefix('v1/user/')->controller(AuthController::class)->group(function () {
+Route::middleware(['api.request', 'api.response', 'api'])->prefix('v1/user/')->controller(AuthController::class)->group(function () {
     Route::post('create', 'register')->name('register');
     Route::post('login', 'login')->name('login');
     Route::middleware(['jwt.verify'])->get('logout', 'logout')->name('logout');
@@ -26,9 +27,9 @@ Route::middleware(['api.format'])->prefix('v1/user/')->controller(AuthController
     Route::post('reset-password-token', 'resetPasswordToken')->name('reset-password-token');
 });
 
-Route::middleware(['api.format', 'jwt.verify', 'auth', 'api'])->prefix('v1/user/')->controller(UserController::class)->group(function () {
-    Route::get('/', 'view')->name('view-user-account');
-    Route::delete('/', 'delete')->name('delete-user-account');
-    Route::get('orders', 'delete')->name('list-user-orders');
-    Route::put('edit', 'delete')->name('update-user');
+Route::middleware(['api.request', 'jwt.verify', 'api.response'])->prefix('v1/')->controller(UserController::class)->group(function () {
+    Route::get('user', 'show')->name('view-user-account');
+    Route::delete('user/{$uuid}', 'destroy')->name('delete-user-account'); //role based
+    Route::get('user/orders', 'orders')->name('list-user-orders'); //need orders table
+    Route::put('user/edit', 'update')->name('update-user');
 });

@@ -31,8 +31,7 @@ class JwtMiddleware
 
             $lcobucciJwt = new LcobucciJWT;
             $apiToken    = $request->bearerToken();
-            $parsedToken = $lcobucciJwt->getParsedToken($apiToken);
-            $uuid        = $parsedToken->claims()->get('jti');
+            $uuid        = $lcobucciJwt->getUserUuid($apiToken);
 
             if (empty($uuid) || !$lcobucciJwt->validateApiToken($apiToken, $uuid)) {
                 return response()->json($response, Response::HTTP_INTERNAL_SERVER_ERROR);

@@ -17,7 +17,6 @@ class ApiRequestFormatter
     public function handle(Request $request, Closure $next)
     {
         $request->headers->set('Accept', 'application/json');
-        $request->merge(array_map('trim', $request->all()));
         return $next($request);
     }
 }
