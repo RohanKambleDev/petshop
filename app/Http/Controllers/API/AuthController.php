@@ -8,13 +8,13 @@ use App\Models\User;
 use App\Models\JwtToken;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Services\Auth\LcobucciJWT;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\API\Auth\LoginRequest;
 use App\Http\Requests\API\Auth\ResetPassword;
 use App\Http\Requests\API\Auth\ForgotPassword;
 use App\Http\Requests\API\Auth\RegisterRequest;
+use App\Facades\LcobucciJwtFacade as Jwt;
 
 class AuthController extends Controller
 {
@@ -26,19 +26,23 @@ class AuthController extends Controller
     protected $extra = [];
     protected $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
 
+    /**
+     * __construct
+     *
+     * @return void
+     */
     public function __construct()
     {
-        $this->lcobucciJwt = new LcobucciJWT;
-        // $this->middleware('jwt.verify', ['except' => ['login', 'register']]);
     }
 
     /**
      * register
      *
-     * @param  mixed $request
-     * @param  mixed $user
-     * @param  mixed $jwtToken
-     * @return void
+     * @param  RegisterRequest $request
+     * @param  User $user
+     * @param  JwtToken $jwtToken
+     * 
+     * @return json
      */
     public function register(RegisterRequest $request, User $user, JwtToken $jwtToken)
     {
@@ -54,7 +58,7 @@ class AuthController extends Controller
         $this->data = $newUser->first()->toArray();
 
         // generate new token
-        $token = $this->lcobucciJwt->getUserApiToken($this->data['uuid']);
+        $token = Jwt::getUserApiToken($this->data['uuid']);
         // insert jwt claims to db
         $insertedToken = $jwtToken->add($token, $newUser->first());
         if (!$insertedToken->first() instanceof JwtToken) {
@@ -91,7 +95,7 @@ class AuthController extends Controller
             $existingJwt = $jwtToken->getRecordByUser(Auth::user()->uuid);
 
             // generate new token
-            $token = $this->lcobucciJwt->getUserApiToken(Auth::user()->uuid);
+            $token = Jwt::getUserApiToken(Auth::user()->uuid);
             // insert jwt claims to db
             $insertedToken = $jwtToken->add($token, Auth::user());
             if (!$insertedToken->first() instanceof JwtToken) {
@@ -123,6 +127,7 @@ class AuthController extends Controller
         // delete jwt token from db
         if (!empty($token) && $jwtToken->removeJwtToken($token)) {
             // prepare for response
+            $this->data['message'] = "Logout successfully";
             $this->success = 1;
             $this->statusCode = Response::HTTP_OK;
         } else {
@@ -152,7 +157,7 @@ class AuthController extends Controller
         }
 
         // user found so get the token
-        $token = $this->lcobucciJwt->getUserApiToken($user->uuid);
+        $token = Jwt::getUserApiToken($user->uuid);
 
         // prepare for response
         $this->success = 1;
@@ -174,9 +179,9 @@ class AuthController extends Controller
         $credentials = $request->validated();
         $apiToken    = $credentials['token'];
 
-        if ($user->resetPassword($credentials)) {
-            $userRecord = $user->getUserByEmail($credentials['email']);
-            if ($userRecord instanceof User && $this->lcobucciJwt->validateApiToken($apiToken, $userRecord->uuid)) {
+        $userRecord = $user->getUserByEmail($credentials['email']);
+        if ($userRecord instanceof User && Jwt::validateApiToken($apiToken)) {
+            if ($user->resetPassword($credentials)) {
                 $this->data['message'] = "Password has been successfully updated";
                 $this->success = 1;
                 $this->statusCode = Response::HTTP_OK;

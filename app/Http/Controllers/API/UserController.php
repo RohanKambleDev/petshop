@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Services\Auth\LcobucciJWT;
+use App\Facades\LcobucciJwtFacade as Jwt;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\User\UserUpdateRequest;
 
@@ -24,14 +24,14 @@ class UserController extends Controller
 
     public function __construct(Request $request, User $user)
     {
-        $this->lcobucciJwt = new LcobucciJWT;
         $this->apiToken    = $request->bearerToken();
-        $this->uuid        = $this->lcobucciJwt->getUserUuid($this->apiToken);
+        $this->uuid        = Jwt::getUserUuid($this->apiToken);
         $this->userObj     = $user->getUserByUuid($this->uuid);
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource
+     * by getting uuid from the token.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response

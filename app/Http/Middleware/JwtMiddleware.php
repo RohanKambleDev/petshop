@@ -6,7 +6,7 @@ use Closure;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Services\Auth\LcobucciJWT;
+use App\Facades\LcobucciJwtFacade as Jwt;
 
 class JwtMiddleware
 {
@@ -19,21 +19,18 @@ class JwtMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
+        $response = [
+            'success' => 0,
+            'data'    => [],
+            'error'   => "Failed to authenticate user",
+            'errors'  => [],
+            'extra'   => []
+        ];
+
         try {
+            $apiToken = $request->bearerToken();
 
-            $response = [
-                'success' => 0,
-                'data'    => [],
-                'error'   => "Failed to authenticate user",
-                'errors'  => [],
-                'extra'   => []
-            ];
-
-            $lcobucciJwt = new LcobucciJWT;
-            $apiToken    = $request->bearerToken();
-            $uuid        = $lcobucciJwt->getUserUuid($apiToken);
-
-            if (empty($uuid) || !$lcobucciJwt->validateApiToken($apiToken, $uuid)) {
+            if (empty($apiToken) || !Jwt::validateApiToken($apiToken)) {
                 return response()->json($response, Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception $e) {

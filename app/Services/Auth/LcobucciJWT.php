@@ -32,74 +32,60 @@ use Lcobucci\JWT\Validation\Constraint\IssuedBy;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Validation\Constraint\IdentifiedBy;
 use Lcobucci\JWT\Validation\Constraint\PermittedFor;
+use App\Services\Auth\LcobucciJwtConfig;
 use Lcobucci\JWT\Validation\Constraint\StrictValidAt;
+use App\Services\Auth\LcobucciJwtInterface;
 
-class LcobucciJWT
+class LcobucciJwt extends LcobucciJwtConfig
 {
-    const KEY_FOLDER_NAME = 'app';
-    const KEY_PATH = 'keys';
-    const PUBLIC_KEY_FILE_NAME = 'petshop.pem';
-    const PRIVATE_KEY_FILE_NAME = 'petshop.key';
     private $uuid = 0;
-
     private $config = '';
 
+    /**
+     * __construct
+     *
+     * @return void
+     */
     public function __construct()
     {
         $this->config = $this->setConfiguration();
     }
-    private function getPrivateKeyPath()
+
+    protected function setAllClaims()
     {
-        return storage_path(self::KEY_FOLDER_NAME . '/' . self::KEY_PATH . '/' . self::PRIVATE_KEY_FILE_NAME);
+        $now = new DateTimeImmutable();
+        $this->IAT_CLAIM = $now;
+        $this->NBF_CLAIM = $now->modify('+1 sec');
+        $this->EXP_CLAIM = $now->modify('+10 minute');
+        $this->JTI_CLAIM = $this->uuid;
     }
 
-    private function getPublicKeyPath()
+    /**
+     * issueToken
+     *
+     * @return string
+     */
+    public function issueToken($uuid)
     {
-        return storage_path(self::KEY_FOLDER_NAME . '/' . self::KEY_PATH . '/' . self::PUBLIC_KEY_FILE_NAME);
-    }
-    private function getPrivateKey()
-    {
-        if (Storage::exists(self::KEY_PATH . '/' . self::PRIVATE_KEY_FILE_NAME)) {
-            return Storage::get(self::KEY_PATH . '/' . self::PRIVATE_KEY_FILE_NAME);
-        }
-    }
+        $this->config = $this->setConfiguration();
+        $this->uuid   = $uuid;
+        $this->setAllClaims();
 
-    private function getPublicKey()
-    {
-        if (Storage::exists(self::KEY_PATH . '/' . self::PUBLIC_KEY_FILE_NAME)) {
-            return Storage::get(self::KEY_PATH . '/' . self::PUBLIC_KEY_FILE_NAME);
-        }
-    }
-    private function setConfiguration()
-    {
-        return Configuration::forAsymmetricSigner(
-            // You may use RSA or ECDSA and all their variations (256, 384, and 512) and EdDSA over Curve25519
-            new Sha256(),
-            InMemory::file($this->getPrivateKeyPath()),
-            InMemory::file($this->getPublicKeyPath())
-            // You may also override the JOSE encoder/decoder if needed by providing extra arguments here
-        );
-    }
-    private function issueToken()
-    {
         assert($this->config instanceof Configuration);
 
-        $now   = new DateTimeImmutable();
-        // $clock = SystemClock::fromUTC(); // use the clock for issuing and validation
-        // $now = $clock->now();
         $token = $this->config->builder()
             // Configures the issuer (iss claim)
-            ->issuedBy('https://rohutech.com')
+            ->issuedBy($this->ISS_CLAIM)
             // Configures the audience (aud claim)
-            // ->permittedFor('https://rohankamble.com')
+            // ->permittedFor($this->AUD_CLAIM)
             // Configures the id (jti claim)
-            ->identifiedBy($this->uuid)
+            ->identifiedBy($this->JTI_CLAIM)
             // Configures the time that the token was issue (iat claim)
-            ->issuedAt($now)
+            ->issuedAt($this->IAT_CLAIM)
             // Configures the time that the token can be used after (nbf claim)
-            ->canOnlyBeUsedAfter($now->modify('+1 sec'))
+            ->canOnlyBeUsedAfter($this->NBF_CLAIM)
             // Configures the expiration time of the token (exp claim)
-            ->expiresAt($now->modify('+10 minute'))
+            ->expiresAt($this->EXP_CLAIM)
             // Configures a new claim, called "uid"
             // ->withClaim('uid', $this->uuid)
             // Configures a new header, called "foo"
@@ -110,8 +96,19 @@ class LcobucciJWT
         return $token->toString();
     }
 
-    private function parseToken($token)
+    /**
+     * parseToken
+     *
+     * @param  string $token
+     * @return void
+     */
+    public function parseToken($token)
     {
+        $this->config = $this->setConfiguration();
+
+        if (empty($token)) {
+            throw new Exception('User not registered');
+        }
         assert($this->config instanceof Configuration);
 
         $parsedToken = $this->config->parser()->parse($token);
@@ -121,45 +118,27 @@ class LcobucciJWT
         return $parsedToken;
     }
 
-    private function validateToken(Token $token)
+
+    /**
+     * validateToken
+     *
+     * @param  Token $token
+     * @param  string $uuid
+     * @return bool
+     */
+    public function validateToken(Token $token, $uuid)
     {
+        $this->config = $this->setConfiguration();
+
         $clock = SystemClock::fromUTC(); // use the clock for issuing and validation
         $this->config->setValidationConstraints(
-            new IdentifiedBy($this->uuid),
-            new IssuedBy('https://rohutech.com'),
-            // new PermittedFor('https://rohankamble.com'),
+            new IdentifiedBy($uuid),
+            new IssuedBy($this->ISS_CLAIM),
+            // new PermittedFor($this->AUD_CLAIM),
             new SignedWith($this->config->signer(), $this->config->verificationKey()),
             new StrictValidAt($clock)
         );
-
         $constraints = $this->config->validationConstraints();
         return $this->config->validator()->validate($token, ...$constraints);
-    }
-
-    public function getUserApiToken($uuid)
-    {
-        $this->uuid = $uuid;
-        return $this->issueToken();
-    }
-
-    public function validateApiToken($token, $uuid)
-    {
-        if (empty($uuid)) {
-            throw new Exception('User not registered');
-        }
-        $this->uuid = $uuid;
-        $parsedToken = $this->parseToken($token);
-        return $this->validateToken($parsedToken);
-    }
-
-    public function getParsedToken($token)
-    {
-        return $this->parseToken($token);
-    }
-
-    public function getUserUuid($token)
-    {
-        $parsedToken = $this->getParsedToken($token);
-        return $parsedToken->claims()->get('jti');
     }
 }

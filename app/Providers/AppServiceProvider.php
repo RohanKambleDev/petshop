@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Auth\Jwt;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +14,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        /**
+         * creating facade for JWT
+         */
+        $this->app->bind('Jwt', function () {
+            return new Jwt();
+        });
     }
 
     /**

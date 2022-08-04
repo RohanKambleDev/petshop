@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+
 use Illuminate\Support\Str;
-use App\Services\Auth\LcobucciJWT;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Facades\LcobucciJwtFacade as Jwt;
 
 class JwtToken extends Model
 {
@@ -96,8 +97,7 @@ class JwtToken extends Model
      */
     public function add($token, $user)
     {
-        $lcobucciJwt = new LcobucciJWT;
-        $parsedToken = $lcobucciJwt->getParsedToken($token);
+        $parsedToken = Jwt::getParsedToken($token);
 
         $data = [
             'unique_id'   => Str::orderedUuid(), // create UUID
@@ -126,8 +126,7 @@ class JwtToken extends Model
 
     public function removeJwtToken($token)
     {
-        $lcobucciJwt = new LcobucciJWT;
-        $uuid = $lcobucciJwt->getUserUuid($token);
+        $uuid = Jwt::getUserUuid($token);
         return self::where('user_id', $uuid)->delete();
     }
 }
