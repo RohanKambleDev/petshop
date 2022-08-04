@@ -1,0 +1,438 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Demo PetShop API - Swagger Documentation",
+        "description": "This API is a demo API for a petshop store built in Laravel 9",
+        "contact": {
+            "email": "rohu2187@gmail.com"
+        },
+        "license": {
+            "name": "Github Repo",
+            "url": "https://github.com/rohu2187/petshop"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://petshop.test/api/v1",
+            "description": "Demo API Server"
+        }
+    ],
+    "paths": {
+        "/user/create": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create a User Account",
+                "description": "Create a User Account",
+                "operationId": "register",
+                "requestBody": {
+                    "description": "Pass user information",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Rohan"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Kamble"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "rohu2187@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "test4321"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "test4321"
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "example": "Avatar image UUID"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Mumabi"
+                                    },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "9999999999"
+                                    },
+                                    "is_marketing": {
+                                        "type": "string",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Login as user account",
+                "description": "Login as user account",
+                "operationId": "login",
+                "requestBody": {
+                    "description": "Pass user information",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "rohu2187@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "test4321"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/user/logout": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Logout an user account",
+                "description": "Logout an user account",
+                "operationId": "logout",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/user/forgot-password": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create a token to reset user password",
+                "description": "Create a token to reset user password",
+                "operationId": "forgotPassword",
+                "requestBody": {
+                    "description": "Pass user information",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "rohu2187@gmail.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/user/reset-password-token": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Reset a User Password with a token",
+                "description": "Reset a User Password with a token",
+                "operationId": "resetPasswordToken",
+                "requestBody": {
+                    "description": "Pass user information",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOZjA1ZTJhLWY1Y2YtNGQ1Ny05YWNhLTA0M"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "rohu2187@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "test4321"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "test4321"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "View a user account",
+                "description": "View a user account",
+                "operationId": "view-user-account",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/user/edit": {
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update a User Account",
+                "description": "Update a User Account",
+                "operationId": "update-user",
+                "requestBody": {
+                    "description": "Pass user information",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Rohan"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Kamble"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "rohu2187@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "test4321"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "test4321"
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "example": "Avatar image UUID"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Mumabi"
+                                    },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "9999999999"
+                                    },
+                                    "is_marketing": {
+                                        "type": "string",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearer_token": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    }
+}

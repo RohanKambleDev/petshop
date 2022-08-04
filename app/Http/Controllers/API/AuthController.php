@@ -24,7 +24,7 @@ class AuthController extends Controller
     protected $error = null;
     protected $errors = [];
     protected $extra = [];
-    protected $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+    protected $statusCode = Response::HTTP_UNAUTHORIZED;
 
     /**
      * __construct
@@ -43,6 +43,55 @@ class AuthController extends Controller
      * @param  JwtToken $jwtToken
      * 
      * @return json
+     */
+    /**
+     * @OA\Post(
+     *      path="/user/create",
+     *      operationId="register",
+     *      tags={"User"},
+     *      summary="Create a User Account",
+     *      description="Create a User Account",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Pass user information",
+     *          @OA\JsonContent(
+     *              required={"email"},
+     *              @OA\Property(property="first_name", type="string", example="Rohan"),
+     *              @OA\Property(property="last_name", type="string", example="Kamble"),
+     *              @OA\Property(property="email", type="string", example="rohu2187@gmail.com"),
+     *              @OA\Property(property="password", type="string", example="test4321"),
+     *              @OA\Property(property="password_confirmation", type="string", example="test4321"),
+     *              @OA\Property(property="avatar", type="string", example="Avatar image UUID"),
+     *              @OA\Property(property="address", type="string", example="Mumabi"),
+     *              @OA\Property(property="phone_number", type="string", example="9999999999"),
+     *              @OA\Property(property="is_marketing", type="string", example="1"),
+     *          ),
+     *       ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      )
+     * )
      */
     public function register(RegisterRequest $request, User $user, JwtToken $jwtToken)
     {
@@ -81,6 +130,48 @@ class AuthController extends Controller
      * @param  mixed $jwtToken
      * @return array
      */
+    /**
+     * @OA\Post(
+     *      path="/user/login",
+     *      operationId="login",
+     *      tags={"User"},
+     *      summary="Login as user account",
+     *      description="Login as user account",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Pass user information",
+     *          @OA\JsonContent(
+     *              required={"email"},
+     *              @OA\Property(property="email", type="string", example="rohu2187@gmail.com"),
+     *              @OA\Property(property="password", type="string", example="test4321"),
+     *          ),
+     *       ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      )
+     * )
+     */
     public function login(LoginRequest $request, User $user, JwtToken $jwtToken)
     {
         // get validated request data
@@ -91,7 +182,7 @@ class AuthController extends Controller
             // update last logged in at
             $user->updateField(Auth::user()->uuid, 'last_login_at', Carbon::now());
 
-            // if found try to use the same
+            // check
             $existingJwt = $jwtToken->getRecordByUser(Auth::user()->uuid);
 
             // generate new token
@@ -121,9 +212,44 @@ class AuthController extends Controller
      * @param  mixed $jwtToken
      * @return array
      */
+    /**
+     * @OA\Get(
+     *      path="/user/logout",
+     *      operationId="logout",
+     *      tags={"User"},
+     *      summary="Logout an user account",
+     *      description="Logout an user account",
+     *      security={{"bearer_token":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      ),
+     * )
+     */
     public function logout(Request $request, JwtToken $jwtToken)
     {
         $token = $request->bearerToken();
+        logger($token);
         // delete jwt token from db
         if (!empty($token) && $jwtToken->removeJwtToken($token)) {
             // prepare for response
@@ -143,6 +269,47 @@ class AuthController extends Controller
      * @param  mixed $request
      * @param  mixed $user
      * @return array
+     */
+    /**
+     * @OA\Post(
+     *      path="/user/forgot-password",
+     *      operationId="forgotPassword",
+     *      tags={"User"},
+     *      summary="Create a token to reset user password",
+     *      description="Create a token to reset user password",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Pass user information",
+     *          @OA\JsonContent(
+     *              required={"email"},
+     *              @OA\Property(property="email", type="string", example="rohu2187@gmail.com"),
+     *          ),
+     *       ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      )
+     * )
      */
     public function forgotPassword(ForgotPassword $request, User $user)
     {
@@ -173,6 +340,50 @@ class AuthController extends Controller
      * @param  mixed $user
      * @return array
      */
+    /**
+     * @OA\Post(
+     *      path="/user/reset-password-token",
+     *      operationId="resetPasswordToken",
+     *      tags={"User"},
+     *      summary="Reset a User Password with a token",
+     *      description="Reset a User Password with a token",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Pass user information",
+     *          @OA\JsonContent(
+     *              required={"token"},
+     *              @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOZjA1ZTJhLWY1Y2YtNGQ1Ny05YWNhLTA0M"),
+     *              @OA\Property(property="email", type="string", example="rohu2187@gmail.com"),
+     *              @OA\Property(property="password", type="string", example="test4321"),
+     *              @OA\Property(property="password_confirmation", type="string", example="test4321"),
+     *          ),
+     *       ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      )
+     * )
+     */
     public function resetPasswordToken(ResetPassword $request, User $user)
     {
         // get validated request data
@@ -190,7 +401,7 @@ class AuthController extends Controller
         }
 
         $this->error = "Invalid or expired token";
-        $this->statusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
+        $this->statusCode = Response::HTTP_FORBIDDEN;
         return $this->buildResponse();
     }
 
