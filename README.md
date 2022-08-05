@@ -1,31 +1,24 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://rohutech.com/wp-content/uploads/2022/08/laravel-petshop-api-transparent.png" width="400"></a></p>
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://rohutech.com/wp-content/uploads/2022/08/laravel-petshop-api-transparent.png" width="300"></a></p>
 
 ## About Laravel PetShop API
 
 Its a PetShop where you can have access to thousands of products for your Pet built over Laravel Framework version 9
 
-## Set up Steps
+## Github repo
+    https://github.com/rohu2187/petshop
+    
 
-# Add following to - /usr/local/etc/httpd/extra/httpd-vhosts.conf
-<VirtualHost *:80>
-    DocumentRoot "/Users/rohankamble/Sites/life/buckhill/petshop/public"
-    ServerName petshop.test
-    ServerAlias petshop.test
-    ErrorLog "/usr/local/var/log/petshop.test-error.log"
-    CustomLog "/usr/local/var/log/petshop.test-access.log" common
-    SetEnv APPLICATION_ENV "development"
-    <Directory "/Users/rohankamble/Sites/life/buckhill/petshop/public">
-        Options Indexes FollowSymLinks MultiViews
-        AllowOverride All
-        Require all granted
-    </Directory>
-</VirtualHost>
+## DEMO
+    Live Swagger Documentation - https://petshop.rohutech.com/api/documentation
 
-# Add following to - /private/etc/hosts
-127.0.0.1 petshop.test
+# Steps to Set up on local machine
 
-# create a DB in mysql DB with name petshop
-
-# run php artisan migrate
-
-# run php artisan db:seed
+1. Get the application files
+   1. download the zip or clone it from github - https://github.com/rohu2187/petshop 
+   2. put it at <your-sites-or-htdocs-folder-path> from where you can load the application
+2. Create a DB in mysql DB with name "petshop"
+3. run php artisan migrate
+4. run php artisan db:seed
+5. run php artisan serve
+6.  To access Swagger Documentation on local
+    1.  can be done at api/documentation, so if using php serve, the url would be http://127.0.0.1:8000/api/documentation
