@@ -11,7 +11,6 @@ use App\Http\Requests\API\User\UserUpdateRequest;
 
 class UserController extends Controller
 {
-    protected $lcobucciJwt;
     protected $success = 0;
     protected $data = [];
     protected $error = null;

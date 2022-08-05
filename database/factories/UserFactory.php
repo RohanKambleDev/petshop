@@ -17,12 +17,18 @@ class UserFactory extends Factory
      */
     public function definition()
     {
+        // hard coded values to use this factory to run Tests
         return [
-            'name' => fake()->name(),
-            'email' => fake()->safeEmail(),
+            'uuid'      => '96f26bc1-3cd2-4154-bec9-1df5c3026387',
+            'first_name' => fake()->name(),
+            'last_name' => fake()->name(),
+            'email' => 'rohu2187@gmail.com',
             'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'remember_token' => Str::random(10),
+            'password' => bcrypt('rohan'),
+            'avatar' => fake()->uuid(),
+            'address' => fake()->address(),
+            'phone_number' => fake()->phoneNumber(),
+            'is_marketing' => 1,
         ];
     }
 

@@ -2,26 +2,13 @@
 
 namespace Tests\Feature;
 
-use Mockery;
 use Tests\TestCase;
-use Illuminate\Support\Facades\App;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class AuthTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    public function test_example()
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-    }
 
     public function responseKeys()
     {
@@ -42,7 +29,7 @@ class AuthTest extends TestCase
         $response = $this->json('POST', '/api/v1/user/create', [
             'first_name' => 'Rohan',
             'last_name' => 'Kamble',
-            'email' => 'rohantest@gmail.com',
+            'email' => 'rohan@gmail.com',
             'password' => 'rohu2187',
             'password_confirmation' => 'rohu2187',
             'avatar' => '818748927349',
@@ -74,11 +61,12 @@ class AuthTest extends TestCase
     public function testLogin()
     {
         // prepare
+        User::factory(1)->create();
 
         // perform
         $response = $this->json('POST', '/api/v1/user/login', [
-            'email' => 'rohantest@gmail.com',
-            'password' => 'rohu2187'
+            'email' => 'rohu2187@gmail.com',
+            'password' => 'rohan'
         ]);
 
         //Write the response in laravel.log
