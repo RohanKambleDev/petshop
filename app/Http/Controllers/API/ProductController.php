@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\User;
-use App\Facades\LcobucciJwtFacade as Jwt;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use App\Facades\JwtUserFacade as JwtUser;
 
 class ProductController extends Controller
 {
@@ -20,13 +19,9 @@ class ProductController extends Controller
     protected $uuid = '';
     protected $userObj = '';
 
-    public function __construct(Request $request, User $user)
+    public function __construct()
     {
-        // can be added to middleware and 
-        // bind the current user object to container
-        $this->apiToken    = $request->bearerToken();
-        $this->uuid        = Jwt::getUserUuid($this->apiToken);
-        $this->userObj     = $user->getUserByUuid($this->uuid);
+        $this->userObj = JwtUser::CheckUser();
     }
 
     /**

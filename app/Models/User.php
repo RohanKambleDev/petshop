@@ -145,7 +145,7 @@ class User extends Authenticatable
      * @param  mixed $uuid
      * @return mixed
      */
-    public function getUserByUuid($uuid)
+    public static function getUserByUuid($uuid)
     {
         if (empty($uuid)) {
             return null;
@@ -205,6 +205,21 @@ class User extends Authenticatable
             $data['password'] = bcrypt($data['password']); // hash the password
         }
         return self::where('uuid', $uuid)->update($data);
+    }
+
+    /**
+     * updateDetails
+     *
+     * @param  User $user
+     * @param  array $data
+     * @return boolean
+     */
+    public function updateDetails(self $user, $data)
+    {
+        if (!empty($data['password'])) {
+            $data['password'] = bcrypt($data['password']); // hash the password
+        }
+        return $user->update($data);
     }
 
     /**

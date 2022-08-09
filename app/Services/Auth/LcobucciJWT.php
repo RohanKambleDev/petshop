@@ -37,6 +37,8 @@ class LcobucciJwt extends LcobucciJwtConfig implements LcobucciJwtInterface
      */
     protected function setClaims()
     {
+        // if JTI is set to use uuid then use uuid
+        // else default uuid will be used which is set in jwt config file
         if ($this->JTI_CLAIM == 'uuid') {
             $this->JTI_CLAIM = $this->uuid;
         }
@@ -85,16 +87,14 @@ class LcobucciJwt extends LcobucciJwtConfig implements LcobucciJwtInterface
      */
     public function parseToken($token)
     {
-        if (empty($token)) {
-            throw new Exception('User not registered');
+        try {
+            assert($this->config instanceof Configuration);
+            $parsedToken = $this->config->parser()->parse($token);
+            assert($parsedToken instanceof UnencryptedToken);
+            return $parsedToken;
+        } catch (Exception $e) {
+            throw new Exception('Invalid Token');
         }
-        assert($this->config instanceof Configuration);
-
-        $parsedToken = $this->config->parser()->parse($token);
-
-        assert($parsedToken instanceof UnencryptedToken);
-
-        return $parsedToken;
     }
 
 
@@ -107,15 +107,19 @@ class LcobucciJwt extends LcobucciJwtConfig implements LcobucciJwtInterface
      */
     public function validateToken(Token $token, $uuid)
     {
-        $clock = SystemClock::fromUTC(); // use the clock for issuing and validation
-        $this->config->setValidationConstraints(
-            new IdentifiedBy($uuid),
-            new IssuedBy($this->ISS_CLAIM),
-            // new PermittedFor($this->AUD_CLAIM),
-            new SignedWith($this->config->signer(), $this->config->verificationKey()),
-            new StrictValidAt($clock)
-        );
-        $constraints = $this->config->validationConstraints();
-        return $this->config->validator()->validate($token, ...$constraints);
+        try {
+            $clock = SystemClock::fromUTC(); // use the clock for issuing and validation
+            $this->config->setValidationConstraints(
+                new IdentifiedBy($uuid),
+                new IssuedBy($this->ISS_CLAIM),
+                // new PermittedFor($this->AUD_CLAIM),
+                new SignedWith($this->config->signer(), $this->config->verificationKey()),
+                new StrictValidAt($clock)
+            );
+            $constraints = $this->config->validationConstraints();
+            return $this->config->validator()->validate($token, ...$constraints);
+        } catch (Exception $e) {
+            throw new Exception('Invalid Token');
+        }
     }
 }

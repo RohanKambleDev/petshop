@@ -15,9 +15,11 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         /**
-         * creating facade for JWT
+         * binding Jwt to service container
+         * which is also used as reference to 
+         * create facade for JWT
          */
-        $this->app->bind('Jwt', function () {
+        app()->bind('Jwt', function () {
             return new Jwt();
         });
     }

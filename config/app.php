@@ -210,7 +210,8 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        'Jwt' => App\Facades\LcobucciJwtFacade::class
+        'Jwt' => App\Facades\LcobucciJwtFacade::class,
+        'JwtUserFacade' => App\Facades\JwtUserFacade::class
     ])->toArray(),
 
 ];

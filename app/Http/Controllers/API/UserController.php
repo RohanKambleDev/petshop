@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Facades\LcobucciJwtFacade as Jwt;
 use App\Http\Controllers\Controller;
+use App\Facades\JwtUserFacade as JwtUser;
 use App\Http\Requests\API\User\UserUpdateRequest;
 
 class UserController extends Controller
@@ -21,11 +20,9 @@ class UserController extends Controller
     protected $uuid = '';
     protected $userObj = '';
 
-    public function __construct(Request $request, User $user)
+    public function __construct()
     {
-        $this->apiToken    = $request->bearerToken();
-        $this->uuid        = Jwt::getUserUuid($this->apiToken);
-        $this->userObj     = $user->getUserByUuid($this->uuid);
+        $this->userObj = JwtUser::CheckUser();
     }
 
     /**
@@ -138,15 +135,14 @@ class UserController extends Controller
     {
         // get validated request data
         $requestData = $request->validated();
-
         $this->error = "Failed to update user detail";
-        if ($this->userObj->updateFieldsInBulk($this->uuid, $requestData)) {
+
+        if ($user->updateDetails($this->userObj, $requestData)) {
             $this->success = 1;
-            $this->data = $user->getUserByUuid($this->uuid)->toArray(); // get fresh data from DB
+            $this->data = User::getUserByUuid($this->userObj->uuid)->toArray(); // get fresh data from DB
             $this->statusCode = Response::HTTP_OK;
             $this->error = "User details updated successfully";
         }
-
 
         return $this->buildResponse();
     }
