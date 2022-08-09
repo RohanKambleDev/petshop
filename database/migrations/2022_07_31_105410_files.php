@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('files', function (Blueprint $table) {
             $table->engine = 'InnoDB'; // Supports transactions, row-level locking, foreign keys and encryption for tables
             $table->increments('id');
-            $table->uuid('uuid');
+            $table->uuid('uuid')->index();
             $table->string('name');
             $table->string('path');
             $table->string('size');

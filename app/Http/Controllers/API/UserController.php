@@ -138,7 +138,6 @@ class UserController extends Controller
     {
         // get validated request data
         $requestData = $request->validated();
-        unset($requestData['avatar']);
 
         if ($this->userObj->updateFieldsInBulk($this->uuid, $requestData)) {
             $this->success = 1;

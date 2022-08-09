@@ -18,7 +18,6 @@ use App\Facades\LcobucciJwtFacade as Jwt;
 
 class AuthController extends Controller
 {
-    protected $lcobucciJwt;
     protected $success = 0;
     protected $data = [];
     protected $error = null;
@@ -97,7 +96,6 @@ class AuthController extends Controller
     {
         // get validated request data
         $requestData = $request->validated();
-        unset($requestData['avatar']);
 
         // insert into user DB
         $newUser = $user->add($requestData);
