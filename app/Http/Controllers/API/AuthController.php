@@ -248,7 +248,6 @@ class AuthController extends Controller
     public function logout(Request $request, JwtToken $jwtToken)
     {
         $token = $request->bearerToken();
-        logger($token);
         // delete jwt token from db
         if (!empty($token) && $jwtToken->removeJwtToken($token)) {
             // prepare for response
