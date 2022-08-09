@@ -48,7 +48,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
+        'password', 'id', 'is_admin', 'is_marketing'
     ];
 
     /**
@@ -60,6 +60,30 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Interact with the last_login_at
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function createdAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => Carbon::parse($value)->format('Y-m-d h:i:s')
+        );
+    }
+
+    /**
+     * Interact with the last_login_at
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function updatedAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => Carbon::parse($value)->format('Y-m-d h:i:s')
+        );
+    }
 
     /**
      * Interact with the last_login_at

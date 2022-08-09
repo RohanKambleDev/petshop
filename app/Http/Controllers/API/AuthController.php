@@ -102,17 +102,18 @@ class AuthController extends Controller
         if (!$newUser instanceof User) {
             throw new Exception('User not registered');
         }
-        $this->data = $newUser->first()->toArray();
+        $newUser->uuid = $newUser->uuid->toString();
+        $this->data = $newUser->toArray();
 
         // generate new token
-        $token = Jwt::getUserApiToken($this->data['uuid']);
+        $token = Jwt::getUserApiToken($newUser->uuid);
+        $this->data['token'] = $token;
+
         // insert jwt claims to db
-        $insertedToken = $jwtToken->add($token, $newUser->first());
+        $insertedToken = $jwtToken->add($token, $newUser);
         if (!$insertedToken->first() instanceof JwtToken) {
             throw new Exception('Token not generated');
         }
-        $this->data['token'] = $token;
-        $this->data['uuid']  = $newUser->pluck('uuid')->first();
 
         // prepare for response
         $this->success = 1;
