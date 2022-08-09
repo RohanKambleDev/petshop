@@ -9,6 +9,7 @@ class Jwt extends LcobucciJwt
 {
     public function __construct()
     {
+        parent::__construct();
     }
     /**
      * getUserApiToken
@@ -18,6 +19,7 @@ class Jwt extends LcobucciJwt
      */
     public function getUserApiToken($uuid)
     {
+        // validate
         $this->checkIfArgsEmpty([$uuid]);
 
         return $this->issueToken($uuid);
@@ -27,11 +29,11 @@ class Jwt extends LcobucciJwt
      * validateApiToken
      *
      * @param  mixed $token
-     * @param  mixed $uuid
-     * @return Lcobucci\JWT\Token $parsedToken
+     * @return bool
      */
     public function validateApiToken($token)
     {
+        // validate
         $this->checkIfArgsEmpty([$token]);
 
         $parsedToken = $this->parseToken($token);
@@ -43,10 +45,11 @@ class Jwt extends LcobucciJwt
      * getParsedToken
      *
      * @param  mixed $token
-     * @return void
+     * @return UnencryptedToken
      */
     public function getParsedToken($token)
     {
+        // validate
         $this->checkIfArgsEmpty([$token]);
 
         return $this->parseToken($token);
@@ -56,16 +59,23 @@ class Jwt extends LcobucciJwt
      * getUserUuid
      *
      * @param  mixed $token
-     * @return void
+     * @return string
      */
     public function getUserUuid($token)
     {
+        // validate
         $this->checkIfArgsEmpty([$token]);
 
         $parsedToken = $this->getParsedToken($token);
         return $parsedToken->claims()->get('jti');
     }
 
+    /**
+     * checkIfArgsEmpty
+     *
+     * @param  mixed $args
+     * @return void
+     */
     public function checkIfArgsEmpty($args = [])
     {
         if (is_array($args)) {

@@ -28,7 +28,8 @@ class RegisterRequest extends FormRequest
             'last_name'    => 'required|string',
             'email'        => 'required|string|email|unique:users,email|max:50',
             'password'     => 'required|confirmed',
-            'avatar'       => 'string',
+            // The field under validation must be present in the input data but can be empty.
+            'avatar'       => 'present',
             'address'      => 'required|string',
             'phone_number' => 'required|string'
         ];

@@ -28,7 +28,8 @@ class UserUpdateRequest extends FormRequest
             'last_name'    => 'string',
             'email'        => 'string|email|max:50',
             'password'     => 'confirmed',
-            'avatar'       => 'string',
+            // The field under validation must be present in the input data but can be empty.
+            'avatar'       => 'present',
             'address'      => 'string',
             'phone_number' => 'string'
         ];

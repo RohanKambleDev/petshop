@@ -10,26 +10,39 @@ use Lcobucci\JWT\Signer\Key\InMemory;
 
 class LcobucciJwtConfig
 {
-    protected $KEY_FOLDER_NAME = 'app';
-    protected $KEY_PATH = 'keys';
-    protected $PUBLIC_KEY_FILE_NAME = 'petshop.pem';
-    protected $PRIVATE_KEY_FILE_NAME = 'petshop.key';
+    protected $KEY_FOLDER_NAME;
+    protected $KEY_PATH;
+    protected $PUBLIC_KEY_FILE_NAME;
+    protected $PRIVATE_KEY_FILE_NAME;
 
     // Configures the issuer (iss claim)
-    protected $ISS_CLAIM = 'https://rohutech.com';
+    protected $ISS_CLAIM;
     // Configures the audience (aud claim)
-    protected $AUD_CLAIM = 'https://rohankamble.com';
+    protected $AUD_CLAIM;
     // Configures the id (jti claim)
-    protected $JTI_CLAIM = '';
+    protected $JTI_CLAIM;
     // Configures the time that the token was issue (iat claim)
-    protected $IAT_CLAIM = '';
+    protected $IAT_CLAIM;
     // Configures the time that the token can be used after (nbf claim)
-    protected $NBF_CLAIM = '';
+    protected $NBF_CLAIM;
     // Configures the expiration time of the token (exp claim)
-    protected $EXP_CLAIM = '';
+    protected $EXP_CLAIM;
 
-    public function __construct()
+    protected function __construct()
     {
+        // jwt path
+        $this->KEY_FOLDER_NAME       = config('jwt.key.folder_name');
+        $this->KEY_PATH              = config('jwt.key.path');
+        $this->PUBLIC_KEY_FILE_NAME  = config('jwt.key.public');
+        $this->PRIVATE_KEY_FILE_NAME = config('jwt.key.private');
+
+        // jwt claims
+        $this->ISS_CLAIM = config('jwt.claims.iss');
+        $this->AUD_CLAIM = config('jwt.claims.aud');
+        $this->JTI_CLAIM = config('jwt.claims.jti');
+        $this->IAT_CLAIM = config('jwt.claims.iat'); // set to now of DateTimeImmutable
+        $this->NBF_CLAIM = config('jwt.claims.iat')->modify(config('jwt.claims.nbf'));
+        $this->EXP_CLAIM = config('jwt.claims.iat')->modify(config('jwt.claims.exp'));
     }
 
     protected function getPrivateKeyPath()

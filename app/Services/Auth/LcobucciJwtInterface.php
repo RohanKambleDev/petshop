@@ -2,11 +2,11 @@
 
 namespace App\Services\Auth;
 
-use PhpParser\Parser\Tokens;
+use Lcobucci\JWT\Token;
 
 interface LcobucciJwtInterface
 {
-    public function issueToken(): string;
-    public function parseToken(): Tokens;
-    public function validateToken(): bool;
+    public function issueToken(string $uuid);
+    public function parseToken(Token $token);
+    public function validateToken(Token $token, $uuid);
 }

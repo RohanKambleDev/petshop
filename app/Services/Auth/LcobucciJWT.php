@@ -1,45 +1,23 @@
 <?php
 
-/**
- * 
- * The JWT specification defines seven reserved claims that are not required, 
-    but are recommended to allow interoperability with third-party applications. These are:
-    iss (issuer): Issuer of the JWT
-    sub (subject): Subject of the JWT (the user)
-    aud (audience): Recipient for which the JWT is intended
-    exp (expiration time): Time after which the JWT expires
-    nbf (not before time): Time before which the JWT must not be accepted for processing
-    iat (issued at time): Time at which the JWT was issued; can be used to determine age of the JWT
-    jti (JWT ID): Unique identifier; can be used to prevent the JWT from being replayed (allows a token to be used only once)
- * 
- * 
- */
-
 namespace App\Services\Auth;
 
 use Exception;
-use DateTimeZone;
-use DateTimeImmutable;
 use Lcobucci\JWT\Token;
-use Lcobucci\Clock\Clock;
 use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\UnencryptedToken;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
-use Lcobucci\JWT\Signer\Key\InMemory;
-use Illuminate\Support\Facades\Storage;
 use Lcobucci\JWT\Validation\Constraint\IssuedBy;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Validation\Constraint\IdentifiedBy;
-use Lcobucci\JWT\Validation\Constraint\PermittedFor;
 use App\Services\Auth\LcobucciJwtConfig;
 use Lcobucci\JWT\Validation\Constraint\StrictValidAt;
 use App\Services\Auth\LcobucciJwtInterface;
 
-class LcobucciJwt extends LcobucciJwtConfig
+class LcobucciJwt extends LcobucciJwtConfig implements LcobucciJwtInterface
 {
-    private $uuid = 0;
-    private $config = '';
+    public $uuid = 0;
+    public $config = '';
 
     /**
      * __construct
@@ -48,16 +26,20 @@ class LcobucciJwt extends LcobucciJwtConfig
      */
     public function __construct()
     {
+        parent::__construct();
         $this->config = $this->setConfiguration();
     }
 
-    protected function setAllClaims()
+    /**
+     * setAllClaims
+     *
+     * @return void
+     */
+    protected function setClaims()
     {
-        $now = new DateTimeImmutable();
-        $this->IAT_CLAIM = $now;
-        $this->NBF_CLAIM = $now->modify('+1 sec');
-        $this->EXP_CLAIM = $now->modify('+10 minute');
-        $this->JTI_CLAIM = $this->uuid;
+        if ($this->JTI_CLAIM == 'uuid') {
+            $this->JTI_CLAIM = $this->uuid;
+        }
     }
 
     /**
@@ -67,9 +49,8 @@ class LcobucciJwt extends LcobucciJwtConfig
      */
     public function issueToken($uuid)
     {
-        $this->config = $this->setConfiguration();
-        $this->uuid   = $uuid;
-        $this->setAllClaims();
+        $this->uuid = $uuid;
+        $this->setClaims();
 
         assert($this->config instanceof Configuration);
 
@@ -100,12 +81,10 @@ class LcobucciJwt extends LcobucciJwtConfig
      * parseToken
      *
      * @param  string $token
-     * @return void
+     * @return UnencryptedToken
      */
     public function parseToken($token)
     {
-        $this->config = $this->setConfiguration();
-
         if (empty($token)) {
             throw new Exception('User not registered');
         }
@@ -128,8 +107,6 @@ class LcobucciJwt extends LcobucciJwtConfig
      */
     public function validateToken(Token $token, $uuid)
     {
-        $this->config = $this->setConfiguration();
-
         $clock = SystemClock::fromUTC(); // use the clock for issuing and validation
         $this->config->setValidationConstraints(
             new IdentifiedBy($uuid),
