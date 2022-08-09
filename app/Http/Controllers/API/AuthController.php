@@ -389,7 +389,7 @@ class AuthController extends Controller
         $credentials = $request->validated();
         $apiToken    = $credentials['token'];
 
-        $userRecord = $user->getUserByEmail($credentials['email']);
+        $userRecord = $user->getUserByEmailAndToken($credentials['email'], $apiToken);
         if ($userRecord instanceof User && Jwt::validateApiToken($apiToken)) {
             if ($user->resetPassword($credentials)) {
                 $this->data['message'] = "Password has been successfully updated";

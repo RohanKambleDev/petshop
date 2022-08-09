@@ -5,13 +5,12 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use Carbon\Carbon;
-use Exception;
-use DateTimeInterface;
 use Illuminate\Support\Str;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Facades\LcobucciJwtFacade as Jwt;
 
 class User extends Authenticatable
 {
@@ -137,23 +136,69 @@ class User extends Authenticatable
         if (empty($email)) {
             return null;
         }
-        return self::where('email', '=', $email)->first();
+        return self::where('email', $email)->first();
     }
 
+    /**
+     * getUserByUuid
+     *
+     * @param  mixed $uuid
+     * @return mixed
+     */
     public function getUserByUuid($uuid)
     {
+        if (empty($uuid)) {
+            return null;
+        }
+
         $user = self::where('uuid', $uuid)->get();
         if ($user->isNotEmpty()) {
             return $user->first();
         }
+
         return collect();
     }
 
+    /**
+     * getUserByEmailAndToken
+     *
+     * @param  mixed $email
+     * @param  mixed $apiToken
+     * @return boolean
+     */
+    public function getUserByEmailAndToken($email, $apiToken)
+    {
+        if (empty($email)) {
+            return null;
+        }
+        if (empty($apiToken)) {
+            return null;
+        }
+
+        $uuid = Jwt::getUserUuid($apiToken);
+        return self::where('email', $email)->where('uuid', $uuid)->first();
+    }
+
+    /**
+     * updateField
+     *
+     * @param  mixed $uuid
+     * @param  mixed $column
+     * @param  mixed $value
+     * @return boolean
+     */
     public function updateField($uuid, $column, $value)
     {
         return self::where('uuid', $uuid)->update([$column => $value]);
     }
 
+    /**
+     * updateFieldsInBulk
+     *
+     * @param  mixed $uuid
+     * @param  mixed $data
+     * @return boolean
+     */
     public function updateFieldsInBulk($uuid, $data)
     {
         if (!empty($data['password'])) {
@@ -162,6 +207,12 @@ class User extends Authenticatable
         return self::where('uuid', $uuid)->update($data);
     }
 
+    /**
+     * deleteRecord
+     *
+     * @param  mixed $uuid
+     * @return boolean
+     */
     public function deleteRecord($uuid)
     {
         return self::where('uuid', $uuid)->delete();

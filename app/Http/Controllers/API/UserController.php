@@ -139,13 +139,15 @@ class UserController extends Controller
         // get validated request data
         $requestData = $request->validated();
 
+        $this->error = "Failed to update user detail";
         if ($this->userObj->updateFieldsInBulk($this->uuid, $requestData)) {
             $this->success = 1;
             $this->data = $user->getUserByUuid($this->uuid)->toArray(); // get fresh data from DB
             $this->statusCode = Response::HTTP_OK;
+            $this->error = "User details updated successfully";
         }
 
-        $this->error = "Failed to update user detail";
+
         return $this->buildResponse();
     }
 
