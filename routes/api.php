@@ -50,6 +50,13 @@ Route::middleware(['api.request', 'jwt.verify', 'api.response'])
 /**
  * products routes
  */
-Route::middleware(['api.request', 'jwt.verify', 'api.response'])
+Route::middleware(['api.request', 'api.response'])
     ->prefix('v1/')
-    ->apiResource('products', ProductController::class);
+    ->controller(ProductController::class)
+    ->group(function () {
+        Route::get('products', 'index')->name('products.index');
+        Route::get('product/{uuid}', 'show')->name('products.show');
+        Route::middleware(['jwt.verify'])->post('product/create', 'store')->name('products.store');
+        Route::middleware(['jwt.verify'])->put('product/{uuid}', 'update')->name('products.update');
+        Route::middleware(['jwt.verify'])->delete('product/{uuid}', 'destroy')->name('products.delete');
+    });
