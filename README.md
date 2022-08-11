@@ -41,5 +41,11 @@ https://petshop.rohutech.com/api/documentation
 
 ### Run Feature Tests
 
-1. To run all the tests as once run following command
-   1. `php artisan test`
+1. Run Individual Tests
+    1. `vendor/bin/phpunit --filter test_product_list`
+    2. `vendor/bin/phpunit --filter test_product_view`
+    3. `vendor/bin/phpunit --filter test_product_create`
+    4. `vendor/bin/phpunit --filter test_product_update`
+    5. `vendor/bin/phpunit --filter test_product_delete`
+    6. `vendor/bin/phpunit --filter test_user_register`
+    7. `vendor/bin/phpunit --filter test_user_login`

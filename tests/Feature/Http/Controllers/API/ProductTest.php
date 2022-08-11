@@ -7,9 +7,6 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
 use App\Services\Auth\Jwt;
-use Illuminate\Http\Request;
-use App\Http\Middleware\JwtMiddleware;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProductTest extends TestCase
