@@ -59,7 +59,7 @@
                                     },
                                     "avatar": {
                                         "type": "string",
-                                        "example": "Avatar image UUID"
+                                        "example": ""
                                     },
                                     "address": {
                                         "type": "string",

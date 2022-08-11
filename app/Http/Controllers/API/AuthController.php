@@ -60,7 +60,7 @@ class AuthController extends Controller
      *              @OA\Property(property="email", type="string", example="rohu2187@gmail.com"),
      *              @OA\Property(property="password", type="string", example="test4321"),
      *              @OA\Property(property="password_confirmation", type="string", example="test4321"),
-     *              @OA\Property(property="avatar", type="string", example="Avatar image UUID"),
+     *              @OA\Property(property="avatar", type="string", example=""),
      *              @OA\Property(property="address", type="string", example="Mumabi"),
      *              @OA\Property(property="phone_number", type="string", example="9999999999"),
      *              @OA\Property(property="is_marketing", type="string", example="1"),
