@@ -25,7 +25,7 @@ class UserFactory extends Factory
             'email' => 'rohu2187@gmail.com',
             'email_verified_at' => now(),
             'password' => bcrypt('rohan'),
-            'avatar' => fake()->uuid(),
+            'avatar' => null,
             'address' => fake()->address(),
             'phone_number' => fake()->phoneNumber(),
             'is_marketing' => 1,

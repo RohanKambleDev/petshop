@@ -21,7 +21,12 @@ class AuthTest extends TestCase
         ];
     }
 
-    public function testRegister()
+    /**
+     * test_user_register
+     *
+     * @return void
+     */
+    public function test_user_register()
     {
         // prepare
 
@@ -32,7 +37,7 @@ class AuthTest extends TestCase
             'email' => 'rohan@gmail.com',
             'password' => 'rohu2187',
             'password_confirmation' => 'rohu2187',
-            'avatar' => '818748927349',
+            'avatar' => null,
             'address' => 'Bhandup',
             'phone_number' => '9967802187',
             'is_marketing' => '1',
@@ -58,7 +63,12 @@ class AuthTest extends TestCase
     }
 
 
-    public function testLogin()
+    /**
+     * test_user_login
+     *
+     * @return void
+     */
+    public function test_user_login()
     {
         // prepare
         User::factory(1)->create();

@@ -90,11 +90,14 @@ class Product extends Model
     public function getAllProducts()
     {
         $products = self::all();
-        $i = 0;
-        foreach ($products as $product) {
-            $productsArr[$i] = $product->toArray();
-            $productsArr[$i]['category'] = $product->getCategory->toArray();
-            $i++;
+        $productsArr = [];
+        if ($products->count()) {
+            $i = 0;
+            foreach ($products as $product) {
+                $productsArr[$i] = $product->toArray();
+                $productsArr[$i]['category'] = $product->getCategory->toArray();
+                $i++;
+            }
         }
         return $productsArr;
     }
