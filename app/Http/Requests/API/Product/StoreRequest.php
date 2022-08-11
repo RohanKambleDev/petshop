@@ -28,7 +28,7 @@ class StoreRequest extends FormRequest
             'title'         => 'required|string',
             'price'         => 'required|numeric',
             'description'   => 'required|string',
-            'metadata'      => 'required|json'
+            'metadata'      => 'required|string'
         ];
     }
 }

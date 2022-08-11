@@ -31,6 +31,39 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    /**
+     * @OA\Get(
+     *      path="/products",
+     *      operationId="products.index",
+     *      tags={"Product"},
+     *      summary="View all products",
+     *      description="View all products",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      ),
+     * )
+     */
     public function index(Category $category)
     {
         $this->success      = 1;
@@ -44,6 +77,51 @@ class ProductController extends Controller
      *
      * @param  \Illuminate\Http\StoreRequest  $request
      * @return \Illuminate\Http\Response
+     */
+    /**
+     * @OA\Post(
+     *      path="/product/create",
+     *      operationId="products.store",
+     *      tags={"Product"},
+     *      summary="create a new product",
+     *      description="create new product",
+     *      security={{"bearer_token":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Pass product information",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="category_uuid", type="string", example="a5da1fb0-fc09-359a-86dc-6b7983e7b693"),
+     *              @OA\Property(property="title", type="string", example="New Pet Food"),
+     *              @OA\Property(property="price", type="string", example="256.88"),
+     *              @OA\Property(property="description", type="string", example="About New Pet Food"),
+     *              @OA\Property(property="metadata", type="string", example="{'image': 'string','brand': 'string'}"),
+     *          ),
+     *       ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      ),
+     * )
      */
     public function store(StoreRequest $request)
     {
@@ -66,6 +144,45 @@ class ProductController extends Controller
      *
      * @param  int  $uuid
      * @return \Illuminate\Http\Response
+     */
+    /**
+     * @OA\Get(
+     *      path="/product/{uuid}",
+     *      operationId="products.show",
+     *      tags={"Product"},
+     *      summary="fetch a product ",
+     *      description="fetch a product",
+     *      @OA\Parameter(
+     *          in="path",
+     *          name="uuid",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      ),
+     * )
      */
     public function show($uuid)
     {
@@ -92,6 +209,57 @@ class ProductController extends Controller
      * @param  int  $uuid
      * @return \Illuminate\Http\Response
      */
+    /**
+     * @OA\Put(
+     *      path="/product/{uuid}",
+     *      operationId="products.update",
+     *      tags={"Product"},
+     *      summary="update a product",
+     *      description="update a product",
+     *      security={{"bearer_token":{}}},
+     *      @OA\Parameter(
+     *          in="path",
+     *          name="uuid",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Pass product information",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="category_uuid", type="string", example="a5da1fb0-fc09-359a-86dc-6b7983e7b693"),
+     *              @OA\Property(property="title", type="string", example="New Pet Food"),
+     *              @OA\Property(property="price", type="string", example="256.88"),
+     *              @OA\Property(property="description", type="string", example="About New Pet Food"),
+     *              @OA\Property(property="metadata", type="string", example="{'image': 'string','brand': 'string'}"),
+     *          ),
+     *       ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      ),
+     * )
+     */
     public function update($uuid, UpdateRequest $request)
     {
         if (!Str::isUuid($uuid)) {
@@ -116,6 +284,46 @@ class ProductController extends Controller
      *
      * @param  int  $uuid
      * @return \Illuminate\Http\Response
+     */
+    /**
+     * @OA\Delete(
+     *      path="/product/{uuid}",
+     *      operationId="products.delete",
+     *      tags={"Product"},
+     *      summary="delete a product",
+     *      description="delete a product",
+     *      security={{"bearer_token":{}}},
+     *      @OA\Parameter(
+     *          in="path",
+     *          name="uuid",
+     *          required=true,
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Unprocessable Entity"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      ),
+     * )
      */
     public function destroy($uuid)
     {

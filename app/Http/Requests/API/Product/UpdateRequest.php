@@ -28,7 +28,7 @@ class UpdateRequest extends FormRequest
             'title'         => 'string',
             'price'         => 'numeric',
             'description'   => 'string',
-            'metadata'      => 'json'
+            'metadata'      => 'string'
         ];
     }
 }

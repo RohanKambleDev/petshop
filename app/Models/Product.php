@@ -108,6 +108,7 @@ class Product extends Model
     public function add($data)
     {
         $data['uuid'] = Str::orderedUuid(); // create UUID
+        $data['metadata'] = json_encode($data['metadata']);
         return self::create($data);
     }
 
@@ -131,6 +132,7 @@ class Product extends Model
      */
     public function updateDetails($uuid, $data)
     {
+        $data['metadata'] = json_encode($data['metadata']);
         return self::where('uuid', $uuid)->update($data);
     }
 
