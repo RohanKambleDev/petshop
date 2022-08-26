@@ -23,7 +23,7 @@ use App\Http\Controllers\API\UserController;
 /**
  * Auth users route
  */
-Route::middleware(['api.request', 'api.response', 'api'])
+Route::middleware(['api.request', 'api.response', 'api', 'trimStrings'])
     ->prefix('v1/user/')
     ->controller(AuthController::class)
     ->group(function () {

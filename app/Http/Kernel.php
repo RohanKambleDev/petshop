@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
         'api.request' => \App\Http\Middleware\ApiRequestFormatter::class,
         'jwt.verify' => \App\Http\Middleware\JwtMiddleware::class,
         'api.response' => \App\Http\Middleware\ApiResponseFormatter::class,
+        'trimStrings' => \App\Http\Middleware\TrimStrings::class,
     ];
 }
